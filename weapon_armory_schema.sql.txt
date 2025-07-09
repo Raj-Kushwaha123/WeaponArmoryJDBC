@@ -1,0 +1,99 @@
+-- Create the database
+CREATE DATABASE IF NOT EXISTS WeaponArmory;
+USE WeaponArmory;
+
+-- Table: Weapons
+CREATE TABLE Weapons (
+    weap_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    caliber VARCHAR(50),
+    price DOUBLE NOT NULL CHECK (price >= 0),
+    stock INT DEFAULT 0 CHECK (stock >= 0),
+    manufacture VARCHAR(100)
+);
+
+-- Table: Attachments
+CREATE TABLE Attachments (
+    attachment_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    price DOUBLE NOT NULL CHECK (price >= 0),
+    stock INT DEFAULT 0 CHECK (stock >= 0),
+    manufacture VARCHAR(100)
+);
+
+-- Table: Weapon_Fits_Attachment (Many-to-Many)
+CREATE TABLE Weapon_Fits_Attachment (
+    weap_id INT,
+    attachment_id INT,
+    PRIMARY KEY (weap_id, attachment_id),
+    FOREIGN KEY (weap_id) REFERENCES Weapons(weap_id) ON DELETE CASCADE,
+    FOREIGN KEY (attachment_id) REFERENCES Attachments(attachment_id) ON DELETE CASCADE
+);
+
+-- Table: Customers
+CREATE TABLE Customers (
+    cust_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    middle_name VARCHAR(50),
+    last_name VARCHAR(50) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    email VARCHAR(100),
+    address TEXT,
+    dob DATE NOT NULL
+);
+
+-- Table: License (One-to-One with Customers)
+CREATE TABLE License (
+    license_id INT AUTO_INCREMENT PRIMARY KEY,
+    expiry_date DATE NOT NULL,
+    customer_id INT UNIQUE,
+    FOREIGN KEY (customer_id) REFERENCES Customers(cust_id) ON DELETE CASCADE
+);
+
+-- Table: Employee
+CREATE TABLE Employee (
+    emp_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    middle_name VARCHAR(50),
+    last_name VARCHAR(50) NOT NULL,
+    position VARCHAR(50),
+    salary DOUBLE NOT NULL CHECK (salary >= 0),
+    hire_date DATE NOT NULL
+);
+
+-- Table: Transaction
+CREATE TABLE Transaction (
+    trans_id INT AUTO_INCREMENT PRIMARY KEY,
+    total_amount DOUBLE NOT NULL CHECK (total_amount >= 0),
+    payment_method VARCHAR(50),
+    emp_id INT,
+    cust_id INT,
+    FOREIGN KEY (emp_id) REFERENCES Employee(emp_id) ON DELETE SET NULL,
+    FOREIGN KEY (cust_id) REFERENCES Customers(cust_id) ON DELETE SET NULL
+);
+
+-- Table: Orders
+CREATE TABLE Orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    trans_id INT,
+    FOREIGN KEY (trans_id) REFERENCES Transaction(trans_id) ON DELETE CASCADE
+);
+
+-- Table: Orders_Weapons (Many-to-Many)
+CREATE TABLE Orders_Weapons (
+    order_id INT,
+    weap_id INT,
+    PRIMARY KEY (order_id, weap_id),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (weap_id) REFERENCES Weapons(weap_id) ON DELETE CASCADE
+);
+
+-- Table: Orders_Attachments (Many-to-Many)
+CREATE TABLE Orders_Attachments (
+    order_id INT,
+    attachment_id INT,
+    PRIMARY KEY (order_id, attachment_id),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (attachment_id) REFERENCES Attachments(attachment_id) ON DELETE CASCADE
+);
