@@ -4,7 +4,7 @@ import java.util.*;
 public class WeaponArmoryJDBC {
     private static final String URL = "jdbc:mysql://localhost:3306/WeaponArmory";
     private static final String USER = "root";
-    private static final String PASSWORD = "r1sh4v@jha";
+    private static final String PASSWORD = "raj@kushwaha";
 
     public static void main(String[] args) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
